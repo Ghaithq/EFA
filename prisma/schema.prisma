@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  username  String   @id
+  password  String
+  firstName String
+  lastName  String
+  birthDate DateTime
+  gender    String
+  city      String
+  address   String?
+  email     String
+  role      String
+}
+
+model Stadium {
+  id    Int     @id @default(autoincrement())
+  name  String
+  rows  Int
+  cols  Int
+  match Match[] @relation("StadiumMatch")
+}
+
+model Team {
+  id          Int     @id @default(autoincrement())
+  name        String
+  homeMatches Match[] @relation("HomeMatch")
+  awayMatches Match[] @relation("AwayMatches")
+}
+
+model Referee {
+  id      Int     @id @default(autoincrement())
+  name    String
+  matches Match[] @relation("RefereeMatches")
+}
+
+model LinesMan {
+  id       Int     @id @default(autoincrement())
+  name     String
+  matches1 Match[] @relation("LinesMan1Matches")
+  matches2 Match[] @relation("LinesMan2Matches")
+}
+
+model Match {
+  id          Int      @id @default(autoincrement())
+  homeTeamid  Int
+  awayTeamid  Int
+  stadiumid   Int
+  date        DateTime
+  refereeid   Int
+  linesMan1id Int
+  linesMan2id Int
+  tickets     Ticket[] @relation("Tickets")
+  homeTeam    Team     @relation("HomeMatch", fields: [homeTeamid], references: [id])
+  awayTeam    Team     @relation("AwayMatches", fields: [awayTeamid], references: [id])
+  stadium     Stadium  @relation("StadiumMatch", fields: [stadiumid], references: [id])
+  referee     Referee  @relation("RefereeMatches", fields: [refereeid], references: [id])
+  linesMan1   LinesMan @relation("LinesMan1Matches", fields: [linesMan1id], references: [id])
+  linesMan2   LinesMan @relation("LinesMan2Matches", fields: [linesMan2id], references: [id])
+}
+
+model Ticket {
+  row     Int
+  col     Int
+  matchid Int
+  match   Match @relation("Tickets", fields: [matchid], references: [id])
+
+  @@id([row, col, matchid])
+}
+
+//Tickets
