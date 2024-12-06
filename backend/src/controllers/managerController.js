@@ -305,7 +305,8 @@ export const addStadium = async (req, res) =>{
         data:{
             name:req.body.name,
             rows:req.body.rows,
-            cols:req.body.cols
+            cols:req.body.cols,
+            url:req.body.imageURL
         }
     })
     return res.status(200).json(createdStadium)

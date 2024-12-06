@@ -27,11 +27,12 @@ model User {
 }
 
 model Stadium {
-  id    Int     @id @default(autoincrement())
-  name  String
-  rows  Int
-  cols  Int
-  match Match[] @relation("StadiumMatch")
+  id       Int     @id @default(autoincrement())
+  name     String
+  rows     Int
+  cols     Int
+  imageURL String  @default("https://en.wikipedia.org/wiki/Stadium#/media/File:Etihad_Stadium.jpg")
+  match    Match[] @relation("StadiumMatch")
 }
 
 model Team {
@@ -80,5 +81,3 @@ model Ticket {
 
   @@id([row, col, matchid])
 }
-
-//Tickets

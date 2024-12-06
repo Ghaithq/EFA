@@ -6,7 +6,8 @@ export const reserveSeat = async (req, res) =>{
             id:req.body.matchid
         },
         include:{
-            stadium:true
+            homeTeam:true,
+            awayTeam:true
         }
     })
     if (match==null)
