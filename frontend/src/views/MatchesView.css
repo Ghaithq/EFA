@@ -177,4 +177,67 @@
   .MuiDialogContent-root .MuiTextField-root {
     margin-bottom: 15px; /* Space between fields */
   }
+
+  /* Edit Button on Match Card */
+.edit-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #ffffff;
+  color: #000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.edit-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.add-match-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+/* Add New Match Button */
+.add-match-button {
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, #4caf50, #66bb6a); /* Green gradient */
+  color: #ffffff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add-match-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.edit-match-dialog .MuiDialogTitle-root {
+  background: #f4f4f4;
+  font-weight: bold;
+}
+
+.edit-match-dialog .MuiDialogActions-root {
+  background: #f4f4f4;
+}
+
+.edit-match-dialog .MuiDialogContent-root {
+  background: #ffffff;
+  padding: 20px;
+}
+
+.MuiTextField-root {
+  margin-bottom: 20px;
+}
+
+.MuiDialogContent-root .MuiTextField-root {
+  margin-bottom: 15px; /* Space between fields */
+}
+
   
