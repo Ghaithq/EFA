@@ -3,50 +3,54 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CardMedia from "@mui/material/CardMedia";
+import { Link } from "react-router-dom";
 
 interface CardCustomProps {
   sx?: any;
   image: string;
   text1: string;
   text2?: string;
+  link : string;
 }
 
-function CardCustom({ sx, image, text1, text2 }: CardCustomProps) {
+function CardCustom({ sx, image, text1, text2 , link}: CardCustomProps) {
   const cardHeight = window.innerHeight * (40 / 100);
   const imageHeight = cardHeight * 0.7;
   sx = { ...sx, height: cardHeight };
   return (
-    <Card sx={sx}>
-      <CardMedia sx={{ height: imageHeight }} image={image} />
-      <CardContent>
-        <Typography
-          gutterBottom
-          variant="h5"
-          component="div"
-          sx={{
-            textAlign: "center",
-            fontWeight: "bold",
-            fontFamily: "Poppins, sans-serif",
-          }}
-        >
-          {text1}
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            color: "text.secondary",
-            textAlign: "center",
-            fontFamily: "Poppins, sans-serif",
-          }}
-        >
-          {text2}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        {/* <Button size="small">Share</Button>
-          <Button size="small">Learn More</Button> */}
-      </CardActions>
-    </Card>
+    <Link to={link} style={{ textDecoration: 'none' }}>
+      <Card sx={sx}>
+        <CardMedia sx={{ height: imageHeight }} image={image} />
+        <CardContent>
+          <Typography
+            gutterBottom
+            variant="h5"
+            component="div"
+            sx={{
+              textAlign: "center",
+              fontWeight: "bold",
+              fontFamily: "Poppins, sans-serif",
+            }}
+          >
+            {text1}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+              textAlign: "center",
+              fontFamily: "Poppins, sans-serif",
+            }}
+          >
+            {text2}
+          </Typography>
+        </CardContent>
+        <CardActions>
+          {/* <Button size="small">Share</Button>
+            <Button size="small">Learn More</Button> */}
+        </CardActions>
+      </Card>
+    </Link>
   );
 }
 
