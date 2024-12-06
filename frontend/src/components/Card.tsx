@@ -6,16 +6,18 @@ import CardMedia from "@mui/material/CardMedia";
 
 interface CardCustomProps {
   sx?: any;
-  height?: number;
   image: string;
   text1: string;
   text2?: string;
 }
 
-function CardCustom({ sx, height, image, text1, text2 }: CardCustomProps) {
+function CardCustom({ sx, image, text1, text2 }: CardCustomProps) {
+  const cardHeight = window.innerHeight * (40 / 100);
+  const imageHeight = cardHeight * 0.7;
+  sx = { ...sx, height: cardHeight };
   return (
     <Card sx={sx}>
-      <CardMedia sx={{ height: height }} image={image} />
+      <CardMedia sx={{ height: imageHeight }} image={image} />
       <CardContent>
         <Typography
           gutterBottom

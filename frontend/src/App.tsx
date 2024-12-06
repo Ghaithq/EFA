@@ -23,7 +23,6 @@ function App() {
       </AppBar>
       <CardCustom
         sx={{ width: "95vw", margin: "0 auto", mt: 2 }}
-        height={300}
         image="../public/Cairo_Stadium-modified.jpg"
         text1="Welcome to Egyptian Premier League Website"
         text2="Here you can reserve your ticket for the next match"
@@ -37,9 +36,9 @@ function App() {
         <Grid size="grow">
           <CardCustom
             sx={{ mb: 2 }}
-            height={250}
             image="../public/football2-modified.jpg"
             text1="Teams"
+            text2="Check out the teams in the league"
           />
         </Grid>
 
@@ -47,9 +46,9 @@ function App() {
         <Grid size="grow">
           <CardCustom
             sx={{ mb: 2 }}
-            height={250}
             image="../public/stad2-modified.jpg"
             text1="Stadiums"
+            text2="Check out the stadiums in Egypt"
           />
         </Grid>
 
@@ -57,9 +56,9 @@ function App() {
         <Grid size="grow">
           <CardCustom
             sx={{ mb: 2 }}
-            height={250}
             image="../public/tickets-modified.jpg"
             text1="Tickets"
+            text2="Reserve your ticket for the next match"
           />
         </Grid>
       </Grid>
