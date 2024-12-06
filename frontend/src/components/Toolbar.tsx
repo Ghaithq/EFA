@@ -2,8 +2,10 @@
 // import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
+import Login from "./LoginModal"
+import Register from "./RegisterModal"
+
 // import Card from "@mui/material/Card";
 // import CardActions from "@mui/material/CardActions";
 // import CardContent from "@mui/material/CardContent";
@@ -37,12 +39,12 @@ function ToolBar(){
           >
             Egyptian Premier League
           </Typography>
-          <Button sx={{ color: "white", backgroundColor: "#02468D", mr: 1,fontFamily: "Poppins, sans-serif" }}>
-            Login
-          </Button>
-          <Button sx={{ color: "white", backgroundColor: "#02468D",fontFamily: "Poppins, sans-serif" }}>
-            Register
-          </Button>
+          <Login>
+
+          </Login>
+          <Register>
+            
+          </Register>
         </Toolbar>);
 }
 
