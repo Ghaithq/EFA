@@ -1,114 +1,64 @@
-// import AppBar from "@mui/material/AppBar";
-// import ToolBar from "../components/Toolbar";
-// import Footer from "../components/Footer"
-// import './StadiumsView.css';
-
-// import { useState } from "react";
-// import { Box, Grid2, Typography } from "@mui/material";
-// import { useInView } from "react-intersection-observer";
-// import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-
-// const StadiumsView = () => {
-//   // Array of stadium images and their names
-//   const stadiums = [
-//     { id: 1, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Cairo International Stadium' },
-//     { id: 2, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Borg El Arab Stadium' },
-//     { id: 3, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Al Ahly Stadium' },
-//     { id: 4, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Petro Sport Stadium' },
-//     { id: 5, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Suez Stadium' },
-//     { id: 6, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Ismailia Stadium' },
-//   ];
-
-//   const [activeIndex, setActiveIndex] = useState(0);
-
-//   return (
-//     <Box
-//       sx={{
-//         width: "100vw",
-//       }}
-//     >
-//       <AppBar position="static" sx={{ backgroundColor: "#FFFFFF" }}>
-//         <ToolBar />
-//       </AppBar>
-
-//       {/* Title Section */}
-//       <Box className = "title-section"
-//       >
-//         <SportsSoccerIcon className = "soccer-icon"
-//         />
-//         <Typography className = "title-text"
-//           variant="h2"
-//         >
-//           Stadiums
-//         </Typography>
-
-//       </Box>
-
-//       <Grid2 container spacing={4} justifyContent="center">
-//         {stadiums.map((stadium, index) => {
-//           const { ref } = useInView({
-//             threshold: 0.7, // Triggers when 70% of the item is visible
-//             onChange: (isInView) => {
-//               if (isInView) setActiveIndex(index);
-//             },
-//           });
-
-//           return (
-//             <Box className = "stadium-section"
-//               ref={ref}
-//               key={stadium.name}
-//               sx={{
-//                 filter: activeIndex === index ? "blur(0px)" : "blur(8px)",
-//               }}
-//             >
-//               <img className = "stadium-image"
-//                 src={stadium.img}
-//                 alt={stadium.name}
-//               />
-//               <Typography className = "stadium-name"
-//                 variant="h4"
-//               >
-//                 {stadium.name}
-//               </Typography>
-//             </Box>
-//           );
-//         })}
-//       <Footer />
-//       </Grid2>
-//     </Box>
-//   );
-// };
-
-// export default StadiumsView;
-
-
-
 import { useState } from 'react';
 import AppBar from "@mui/material/AppBar";
 import ToolBar from "../components/Toolbar";
 import Footer from "../components/Footer";
-import { Box, Grid, Typography, Card, CardMedia, CardContent } from "@mui/material";
+import { Box, Grid, Typography, Card, CardMedia, CardContent, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import { useInView } from "react-intersection-observer";
 import './StadiumsView.css';
 
-const stadiums = [
-  { id: 1, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Cairo International Stadium' },
-  { id: 2, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Borg El Arab Stadium' },
-  { id: 3, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Al Ahly Stadium' },
-  { id: 4, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Petro Sport Stadium' },
-  { id: 5, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Suez Stadium' },
-  { id: 6, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Ismailia Stadium' },
-];
-
 const StadiumsView = () => {
-  const [, setActiveIndex] = useState(0);
+  const [stadiums, setStadiums] = useState([
+    { id: 1, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Cairo International Stadium' },
+    { id: 2, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Borg El Arab Stadium' },
+    { id: 3, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Al Ahly Stadium' },
+    { id: 4, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Petro Sport Stadium' },
+    { id: 5, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Suez Stadium' },
+    { id: 6, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Ismailia Stadium' },
+  ]);
+
+  const [open, setOpen] = useState(false);
+  const [newStadium, setNewStadium] = useState({ name: '', img: '' });
+
+  // Function to open the dialog
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  // Function to close the dialog
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  // Function to add a new stadium
+  const handleAddStadium = () => {
+    const newStadiumObj = {
+      id: stadiums.length + 1, // Ensure the id is unique
+      name: newStadium.name,
+      img: newStadium.img,
+    };
+
+    // Update the state immutably using the setState function
+    setStadiums((prevStadiums) => [...prevStadiums, newStadiumObj]); // Add the new stadium to the existing list
+
+    setOpen(false); // Close the dialog
+    setNewStadium({ name: '', img: '' }); // Reset the form
+  };
 
   return (
     <Box sx={{ width: "100vw" }}>
       <AppBar position="static" color="default" className="app-bar">
         <ToolBar />
       </AppBar>
+
+      {/* Add Stadium Button */}
+      <Button
+        variant="contained"
+        color="primary"
+        className="add-stadium-button"
+        onClick={handleClickOpen}
+      >
+        Add New Stadium
+      </Button>
 
       {/* Title Section */}
       <Box className="title-section">
@@ -119,18 +69,10 @@ const StadiumsView = () => {
       </Box>
 
       <Grid container spacing={4} justifyContent="center">
-        {stadiums.map((stadium, index) => {
-          const { ref } = useInView({
-            threshold: 0.7, // Triggers when 70% of the item is visible
-            onChange: (isInView) => {
-              if (isInView) setActiveIndex(index);
-            },
-          });
-
+        {stadiums.map((stadium) => {
           return (
             <Grid item xs={12} sm={6} md={4} key={stadium.id}>
               <Card
-                ref={ref}
                 className="stadium-card"
               >
                 <CardMedia
@@ -152,6 +94,38 @@ const StadiumsView = () => {
       </Grid>
 
       <Footer />
+
+      {/* Dialog for Adding New Stadium */}
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Add New Stadium</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Stadium Name"
+            type="text"
+            fullWidth
+            value={newStadium.name}
+            onChange={(e) => setNewStadium({ ...newStadium, name: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Image URL"
+            type="text"
+            fullWidth
+            value={newStadium.img}
+            onChange={(e) => setNewStadium({ ...newStadium, img: e.target.value })}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleAddStadium} color="primary">
+            Add Stadium
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
