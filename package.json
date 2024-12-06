@@ -1,21 +1,7 @@
 {
-  "name": "efa",
-  "version": "1.0.0",
-  "description": "A website for ticket booking of efa matches",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.0.1",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.1",
-    "jsonwebtoken": "^9.0.2",
-    "nodemon": "^3.1.7"
-  },
-  "devDependencies": {
-    "prisma": "^6.0.1"
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
+    "@mui/material": "^6.1.10"
   }
 }
