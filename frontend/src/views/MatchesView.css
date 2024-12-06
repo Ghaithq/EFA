@@ -1,0 +1,180 @@
+/* AppBar */
+.app-bar {
+    background-color: #ffffff; /* Clean white background */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    padding: 10px 20px;
+  }
+  
+  /* Title Section */
+  .title-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 40px; /* Space between title and matches */
+    gap: 15px; /* More space between icon and text */
+  }
+  
+  .soccer-icon {
+    font-size: 70px; /* Bigger icon for emphasis */
+    color: #ff6f00; /* Vibrant orange */
+    animation: bounce 1.5s infinite ease-in-out; /* Smooth, shorter bounce */
+  }
+  
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-15px); /* Slightly higher bounce */
+    }
+    60% {
+      transform: translateY(-7px);
+    }
+  }
+  
+  .title-text {
+    font-size: 2.5rem; /* Larger font for main title */
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+    text-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); /* More prominent glow */
+  }
+  
+  /* Match Card */
+  .match-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 25px;
+    border-radius: 20px; /* Softer corners */
+    background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2), -5px -5px 15px rgba(255, 255, 255, 0.5); /* Neumorphic effect */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .match-card:hover {
+    transform: scale(1.08); /* More noticeable scaling */
+    box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.3), -8px -8px 20px rgba(255, 255, 255, 0.6); /* Enhanced shadow on hover */
+  }
+  
+  .team-logo {
+    width: 100px; /* Uniform width */
+    height: 100px; /* Uniform height */
+    object-fit: cover;
+    border-radius: 50%; /* Perfect circle */
+    background-color: #ffffff; /* Background for better contrast */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow for logo */
+    margin-bottom: 10px;
+  }
+  
+  .team-name {
+    font-size: 1.5rem; /* Larger and bolder text for team names */
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0;
+    color: #333; /* Slightly darker text */
+  }
+  
+  .match-details,
+  .stadium-name {
+    margin-top: 10px !important;
+    text-align: center;
+    font-size: 1rem; /* Standard font size for details */
+    color: #555; /* Muted text color */
+    margin-bottom: 8px;
+  }
+  
+  .reserve-button-container {
+    display: flex;
+    justify-content: center; /* Center the button horizontally */
+  }
+  
+  .reserve-button {
+    margin-top: 20px !important;
+    padding: 12px 30px; /* Larger button */
+    font-size: 1rem;
+    background: linear-gradient(135deg, #ff6f00, #ff8c1a); /* Bold gradient */
+    color: #ffffff;
+    border: none;
+    border-radius: 25px; /* More modern rounded shape */
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .reserve-button:hover {
+    transform: translateY(-3px); /* Lift effect on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Enhanced hover shadow */
+    background: linear-gradient(135deg, #ff8c1a, #ff6f00); /* Reverse gradient */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .title-text {
+      font-size: 2rem; /* Adjust title size for smaller screens */
+    }
+  
+    .soccer-icon {
+      font-size: 60px; /* Reduce size on mobile */
+    }
+  
+    .match-card {
+      padding: 20px; /* Compact padding */
+    }
+  
+    .reserve-button {
+      padding: 10px 20px; /* Smaller button */
+      font-size: 0.9rem;
+    }
+  }
+  
+/* Add New Match Button */
+.add-match-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+  }
+  
+  .add-match-button {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, #4caf50, #66bb6a); /* Green gradient */
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .add-match-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #66bb6a, #4caf50);
+  }
+  
+  /* Add Match Dialog */
+  .add-match-dialog .MuiDialogTitle-root {
+    background: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  .add-match-dialog .MuiDialogActions-root {
+    background: #f4f4f4;
+  }
+  
+  .add-match-dialog .MuiDialogContent-root {
+    background: #ffffff;
+    padding: 20px;
+  }
+  
+  .MuiTextField-root {
+    margin-bottom: 20px;
+  }
+  
+  .MuiDialogContent-root .MuiTextField-root {
+    margin-bottom: 15px; /* Space between fields */
+  }
+  

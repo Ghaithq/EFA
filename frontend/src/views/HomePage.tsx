@@ -24,7 +24,7 @@ function HomePage() {
       <CardCustom
         sx={{ width: "95vw", margin: "0 auto", mt: 2 }}
         image="../Cairo_Stadium-modified.jpg"
-        text1="Welcome to Egyptian Premier League Website"
+        text1="Welcome to The Egyptian Premier League Website"
         text2="Here you can reserve your ticket for the next match"
         link=""
       />
@@ -38,9 +38,9 @@ function HomePage() {
           <CardCustom
             sx={{ mb: 2 }}
             image="../football2-modified.jpg"
-            text1="Teams"
-            text2="Check out the teams in the league"
-            link=""
+            text1="Matches"
+            text2="Check out the matches in the league"
+            link="/matches"
           />
         </Grid>
 
