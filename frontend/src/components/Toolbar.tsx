@@ -20,7 +20,7 @@ function ToolBar(){
             sx={{ mr: -2, ml: -5 }}
           >
             <img
-              src="../../public/logo.png"
+              src="../../logo.png"
               alt="logo"
               style={{ width: 200, height: 100 }}
             />
