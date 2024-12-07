@@ -16,7 +16,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Autocomplete from "@mui/material/Autocomplete";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import Grid from "@mui/material/Grid2";
 
 const style = {
   position: "absolute",
@@ -119,22 +119,24 @@ export default function Register() {
       >
         <Fade in={open}>
           <Box sx={style}>
-            <TextField
-              label="username"
-              id="outlined-username"
-              sx={{
-                width: "100%",
-                fontFamily: "Poppins, sans-serif",
-              }}
-            />
-            <TextField
-              label="First Name"
-              id="outlined-firstname"
-              sx={{
-                width: "100%",
-                fontFamily: "Poppins, sans-serif",
-              }}
-            />
+          <Grid container spacing={2} sx={{ width: "100%" }}>
+                <TextField
+                  label="First Name"
+                  id="outlined-firstname"
+                  sx={{
+                    width: "47.5%",
+                    fontFamily: "Poppins, sans-serif",
+                  }}
+                />
+                <TextField
+                  label="Last Name"
+                  id="outlined-lastname"
+                  sx={{
+                    width: "47.5%",
+                    fontFamily: "Poppins, sans-serif",
+                  }}
+                />
+            </Grid>
             <TextField
               label="email"
               id="outlined-email"
@@ -144,25 +146,32 @@ export default function Register() {
               }}
             />
             <TextField
-              label="Last Name"
-              id="outlined-lastname"
+              label="username"
+              id="outlined-username"
               sx={{
                 width: "100%",
                 fontFamily: "Poppins, sans-serif",
               }}
             />
-            <Autocomplete
-              disablePortal
-              options={genders}
-              sx={{ width: "100%" }}
-              renderInput={(params) => <TextField {...params} label="Gender" />}
-            />
-            <Autocomplete
-              disablePortal
-              options={egyptianCities}
-              sx={{ width: "100%" }}
-              renderInput={(params) => <TextField {...params} label="City" />}
-            />
+            <Grid container spacing={2} sx={{ width: "100%" }}>
+                <Autocomplete
+                  disablePortal
+                  options={genders}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Gender" />
+                  )}
+                  sx={{width:"47.5%"}}
+                />
+                <Autocomplete
+                  disablePortal
+                  options={egyptianCities}
+                  renderInput={(params) => (
+                    <TextField {...params} label="City" />
+                  )}
+                  sx={{width:"47.5%"}}
+                />
+            </Grid>
+
             <TextField
               label="Address"
               id="outlined-lastname"
@@ -237,12 +246,15 @@ export default function Register() {
                 label="Confirm Password"
               />
             </FormControl>
-            <LocalizationProvider dateAdapter={AdapterDayjs} >
-        <DatePicker sx={{
-                width: "100%",
-                fontFamily: "Poppins, sans-serif",
-              }} label="Basic date picker" />
-    </LocalizationProvider>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                sx={{
+                  width: "100%",
+                  fontFamily: "Poppins, sans-serif",
+                }}
+                label="Basic date picker"
+              />
+            </LocalizationProvider>
             <Button
               sx={{
                 color: "white",
