@@ -4,6 +4,7 @@ import 'dotenv'
 export const isLoggedIn = async (req, res, next) => {
     const authHeader = req.headers["authorization"]
     const token = authHeader && authHeader.split(' ')[1]
+    console.log(token)
     if (token == null) return res.status(404).json({
         message: "no token found"
     })

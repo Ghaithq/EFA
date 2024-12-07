@@ -5,6 +5,8 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Login from "./LoginModal"
 import Register from "./RegisterModal"
+import Profile  from "./Profile";
+import Logout  from "./Logout";
 
 // import Card from "@mui/material/Card";
 // import CardActions from "@mui/material/CardActions";
@@ -39,12 +41,10 @@ function ToolBar(){
           >
             Egyptian Premier League
           </Typography>
-          <Login>
-
-          </Login>
-          <Register>
-            
-          </Register>
+          <Login />
+          <Register />
+          <Profile />
+          <Logout />
         </Toolbar>);
 }
 

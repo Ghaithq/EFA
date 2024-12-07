@@ -1,17 +1,24 @@
 import * as React from "react";
-import Backdrop from "@mui/material/Backdrop";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
-import Fade from "@mui/material/Fade";
-import Button from "@mui/material/Button";
-import InputLabel from "@mui/material/InputLabel";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormControl from "@mui/material/FormControl";
-import IconButton from "@mui/material/IconButton";
+import { useState } from "react";
+import {
+  Alert,
+  Snackbar,
+  Backdrop,
+  Box,
+  Modal,
+  Fade,
+  Button,
+  InputLabel,
+  OutlinedInput,
+  InputAdornment,
+  FormControl,
+  IconButton,
+  TextField,
+} from "@mui/material";
+import axios from "axios";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Visibility from "@mui/icons-material/Visibility";
-import TextField from "@mui/material/TextField";
+import Cookies from 'js-cookie';
 
 const style = {
   position: "absolute",
@@ -39,7 +46,11 @@ export default function Login() {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
+  const [showButton,setShowButton]=useState(localStorage.getItem('jwt')==null)
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (
@@ -53,9 +64,54 @@ export default function Login() {
     event.preventDefault();
   };
 
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success");
+  const [alertOpen, setAlertOpen] = useState(false);
+
+  const handleChange = (field) => (event, value) => {
+    setFormData({
+      ...formData,
+      [field]: value ?? event.target.value,
+    });
+  };
+  const handleCloseAlert = () => setAlertOpen(false);
+
+  const handleLogin = async () => {
+    await axios
+      .post(
+        "http://localhost:3000/login",
+        {
+          username: formData.username,
+          password: formData.password
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then(function (response) {
+        setAlertType("success");
+        setAlertOpen(true);
+        
+        
+        localStorage.setItem('jwt', response.data.jwt);
+        setShowButton(false)
+        setAlertMessage("Signed in successfully!");
+        setOpen(false);
+        window.location.reload();
+      })
+      .catch(function (error) {
+        setAlertType("error");
+        setAlertOpen(true);
+        setAlertMessage(error.response.data.message);
+        console.log(error);
+      });
+  };
+
   return (
     <div>
-      <Button
+      {showButton&&<Button
         onClick={handleOpen}
         sx={{
           color: "white",
@@ -65,7 +121,18 @@ export default function Login() {
         }}
       >
         Login
-      </Button>
+      </Button>}
+
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseAlert}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleCloseAlert} severity={alertType}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -82,6 +149,7 @@ export default function Login() {
         <Fade in={open}>
           <Box sx={style}>
             <TextField
+              onChange={handleChange("username")}
               label="username"
               id="outlined-start-adornment"
               sx={{
@@ -94,10 +162,11 @@ export default function Login() {
               width: "100%",
               fontFamily: "Poppins, sans-serif",
             }} variant="outlined">
-              <InputLabel htmlFor="outlined-adornment-password">
+              <InputLabel  htmlFor="outlined-adornment-password">
                 Password
               </InputLabel>
               <OutlinedInput
+                onChange={handleChange("password")}
                 id="outlined-adornment-password"
                 type={showPassword ? "text" : "password"}
                 endAdornment={
@@ -122,6 +191,7 @@ export default function Login() {
             </FormControl>
                 
             <Button
+            onClick={handleLogin}
               sx={{
                 color: "white",
                 backgroundColor: "#02468D",

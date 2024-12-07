@@ -1,6 +1,17 @@
 import prisma from "../client.js"
 
 export const createMatch = async (req, res) => {
+    if (req.body.homeTeamid == null || req.body.homeTeamid == "" || !req.body.homeTeamid.isInteger() ||
+        req.body.awayTeamid == null || req.body.awayTeamid == "" ||!req.body.awayTeamid.isInteger() ||
+        req.body.refereeid == null || req.body.refereeid == "" || !req.body.refereeid.isInteger()||
+        req.body.linesMan1id == null || req.body.linesMan1id == "" ||req.body.linesMan1id.isInteger()||
+        req.body.linesMan2id == null || req.body.linesMan2id == "" ||!req.body.linesMan2id.isInteger() ||
+        req.body.stadiumid == null || req.body.stadiumid == "" || !req.body.stadiumid.isInteger()  ||
+        req.body.date == null || req.body.date == "" 
+    )
+        return res.status(400).json({
+            message: "Please provide correct input"
+        })
     const homeTeam = await prisma.team.findUnique({
         where: {
             id: req.body.homeTeamid
@@ -145,6 +156,17 @@ export const createMatch = async (req, res) => {
 
 
 export const editMatch = async (req, res) => {
+    if (req.body.homeTeamid == null || req.body.homeTeamid == "" || !req.body.homeTeamid.isInteger() ||
+        req.body.awayTeamid == null || req.body.awayTeamid == "" ||!req.body.awayTeamid.isInteger() ||
+        req.body.refereeid == null || req.body.refereeid == "" || !req.body.refereeid.isInteger()||
+        req.body.linesMan1id == null || req.body.linesMan1id == "" ||req.body.linesMan1id.isInteger()||
+        req.body.linesMan2id == null || req.body.linesMan2id == "" ||!req.body.linesMan2id.isInteger() ||
+        req.body.stadiumid == null || req.body.stadiumid == "" || !req.body.stadiumid.isInteger() ||
+        req.body.date == null || req.body.date == "" 
+    )
+        return res.status(400).json({
+            message: "Please provide correct input"
+        })
     const match = await prisma.match.findFirst({
         where: {
             id: req.body.matchid
@@ -300,13 +322,21 @@ export const editMatch = async (req, res) => {
 }
 
 
-export const addStadium = async (req, res) =>{
-    const createdStadium=await prisma.stadium.create({
-        data:{
-            name:req.body.name,
-            rows:req.body.rows,
-            cols:req.body.cols,
-            url:req.body.imageURL
+export const addStadium = async (req, res) => {
+    if (req.body.name == null || req.body.name == "" || 
+        req.body.rows == null || req.body.rows == "" || !req.body.rows.isInteger() ||
+        req.body.cols == null || req.body.cols == "" || !req.body.isInteger() ||
+        req.body.imageURL == null || req.body.imageURL == ""
+    )
+        return res.status(400).json({
+            message: "Please provide correct input"
+        })
+    const createdStadium = await prisma.stadium.create({
+        data: {
+            name: req.body.name,
+            rows: req.body.rows,
+            cols: req.body.cols,
+            url: req.body.imageURL
         }
     })
     return res.status(200).json(createdStadium)

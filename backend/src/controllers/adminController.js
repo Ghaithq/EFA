@@ -6,6 +6,10 @@ export const authorize = async (req, res) => {
         return res.status(400).json({
             message: "you are not authorized"
         })
+    if (req.body.username == null || req.body.username == "")
+        return res.status(400).json({
+            message: "Please provide correct input"
+        })
     let userToAuthorize = await prisma.user.findFirst({
         where: {
             username: req.body.username
@@ -41,6 +45,10 @@ export const removeUser = async (req, res) => {
     if (req.user.role != 'Admin')
         return res.status(400).json({
             message: "you are not authorized"
+        })
+    if (req.body.username == null || req.body.username == "")
+        return res.status(400).json({
+            message: "Please provide correct input"
         })
     let userToDelete = await prisma.user.findFirst({
         where: {
