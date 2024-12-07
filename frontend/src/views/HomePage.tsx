@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid2";
 import ToolBar from "../components/Toolbar";
 import CardCustom from "../components/Card";
+import Footer from "../components/Footer";
 
 function HomePage() {
   return (
@@ -66,6 +67,7 @@ function HomePage() {
           />
         </Grid>
       </Grid>
+      <Footer />
     </Box>
   );
 }
