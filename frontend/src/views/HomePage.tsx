@@ -62,7 +62,7 @@ function HomePage() {
             image="../tickets-modified.jpg"
             text1="Tickets"
             text2="Reserve your ticket for the next match"
-            link=""
+            link="/tickets"
           />
         </Grid>
       </Grid>
