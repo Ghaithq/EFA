@@ -1,0 +1,10 @@
+INSERT INTO "LinesMan" ("name") VALUES ('Darren Cann');
+INSERT INTO "LinesMan" ("name") VALUES ('Mike Mullarkey');
+INSERT INTO "LinesMan" ("name") VALUES ('Simon Beck');
+INSERT INTO "LinesMan" ("name") VALUES ('Gary Beswick');
+INSERT INTO "LinesMan" ("name") VALUES ('Stuart Burt');
+INSERT INTO "LinesMan" ("name") VALUES ('Pawel Sokolnicki');
+INSERT INTO "LinesMan" ("name") VALUES ('Tomasz Listkiewicz');
+INSERT INTO "LinesMan" ("name") VALUES ('Sander van Roekel');
+INSERT INTO "LinesMan" ("name") VALUES ('Erwin Zeinstra');
+INSERT INTO "LinesMan" ("name") VALUES ('Roberto Alonso Fernandez');

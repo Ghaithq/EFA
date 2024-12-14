@@ -1,12 +1,12 @@
 import prisma from "../client.js"
 
 export const createMatch = async (req, res) => {
-    if (req.body.homeTeamid == null || req.body.homeTeamid == "" || !req.body.homeTeamid.isInteger() ||
-        req.body.awayTeamid == null || req.body.awayTeamid == "" ||!req.body.awayTeamid.isInteger() ||
-        req.body.refereeid == null || req.body.refereeid == "" || !req.body.refereeid.isInteger()||
-        req.body.linesMan1id == null || req.body.linesMan1id == "" ||req.body.linesMan1id.isInteger()||
-        req.body.linesMan2id == null || req.body.linesMan2id == "" ||!req.body.linesMan2id.isInteger() ||
-        req.body.stadiumid == null || req.body.stadiumid == "" || !req.body.stadiumid.isInteger()  ||
+    if (req.body.homeTeamid == null || req.body.homeTeamid == "" || !Number.isInteger(req.body.homeTeamid) ||
+        req.body.awayTeamid == null || req.body.awayTeamid == "" ||!Number.isInteger(req.body.awayTeamid) ||
+        req.body.refereeid == null || req.body.refereeid == "" || !Number.isInteger(req.body.refereeid)||
+        req.body.linesMan1id == null || req.body.linesMan1id == "" || !Number.isInteger(req.body.linesMan1id)||
+        req.body.linesMan2id == null || req.body.linesMan2id == "" ||!Number.isInteger(req.body.linesMan2id) ||
+        req.body.stadiumid == null || req.body.stadiumid == "" || !Number.isInteger(req.body.stadiumid)  ||
         req.body.date == null || req.body.date == "" 
     )
         return res.status(400).json({
@@ -323,10 +323,10 @@ export const editMatch = async (req, res) => {
 
 
 export const addStadium = async (req, res) => {
-    if (req.body.name == null || req.body.name == "" || 
-        req.body.rows == null || req.body.rows == "" || !req.body.rows.isInteger() ||
-        req.body.cols == null || req.body.cols == "" || !req.body.isInteger() ||
-        req.body.imageURL == null || req.body.imageURL == ""
+    if (req.body.name == null || req.body.name === "" || 
+        req.body.rows == null || req.body.rows === "" || !Number.isInteger(req.body.rows) ||
+        req.body.cols == null || req.body.cols === "" || !Number.isInteger(req.body.cols) ||
+        req.body.imageURL == null || req.body.imageURL === ""
     )
         return res.status(400).json({
             message: "Please provide correct input"
@@ -336,7 +336,7 @@ export const addStadium = async (req, res) => {
             name: req.body.name,
             rows: req.body.rows,
             cols: req.body.cols,
-            url: req.body.imageURL
+            imageURL: req.body.imageURL
         }
     })
     return res.status(200).json(createdStadium)

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import AppBar from "@mui/material/AppBar";
 import ToolBar from "../components/Toolbar";
 import Footer from "../components/Footer";
@@ -7,17 +8,23 @@ import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import './StadiumsView.css';
 
 const StadiumsView = () => {
-  const [stadiums, setStadiums] = useState([
-    { id: 1, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Cairo International Stadium' },
-    { id: 2, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Borg El Arab Stadium' },
-    { id: 3, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Al Ahly Stadium' },
-    { id: 4, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Petro Sport Stadium' },
-    { id: 5, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Suez Stadium' },
-    { id: 6, img: 'https://i.pinimg.com/originals/61/28/03/61280310accff08308966f1a21c1d849.jpg', name: 'Ismailia Stadium' },
-  ]);
-
+  const [stadiums, setStadiums] = useState([]);
   const [open, setOpen] = useState(false);
-  const [newStadium, setNewStadium] = useState({ name: '', img: '' });
+  const [newStadium, setNewStadium] = useState({ name: '', rows: '', cols: '', img: '' });
+
+  // Fetch stadiums from the database
+  useEffect(() => {
+    const fetchStadiums = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/get-all-stadiums');
+        setStadiums(response.data);
+      } catch (error) {
+        console.error("Error fetching stadiums:", error);
+      }
+    };
+
+    fetchStadiums();
+  }, []);
 
   // Function to open the dialog
   const handleClickOpen = () => {
@@ -30,18 +37,31 @@ const StadiumsView = () => {
   };
 
   // Function to add a new stadium
-  const handleAddStadium = () => {
+  const handleAddStadium = async () => {
+    const rows = Math.min(Math.max(parseInt(newStadium.rows, 10) || 0, 0), 99);
+    const cols = Math.min(Math.max(parseInt(newStadium.cols, 10) || 0, 0), 99);
+
     const newStadiumObj = {
-      id: stadiums.length + 1, // Ensure the id is unique
       name: newStadium.name,
-      img: newStadium.img,
+      rows,
+      cols,
+      imageURL: newStadium.img,
     };
 
-    // Update the state immutably using the setState function
-    setStadiums((prevStadiums) => [...prevStadiums, newStadiumObj]); // Add the new stadium to the existing list
+    try {
+      const response = await axios.post('http://localhost:3000/manager/add-stadium', newStadiumObj, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      });
 
-    setOpen(false); // Close the dialog
-    setNewStadium({ name: '', img: '' }); // Reset the form
+      setStadiums((prevStadiums) => [...prevStadiums, response.data]);
+      setOpen(false); // Close the dialog
+      setNewStadium({ name: '', rows: '', cols: '', img: '' }); // Reset the form
+    } catch (error) {
+      console.error("Error adding stadium:", error);
+    }
   };
 
   return (
@@ -78,7 +98,7 @@ const StadiumsView = () => {
                 <CardMedia
                   component="img"
                   height="200"
-                  image={stadium.img}
+                  image={stadium.imageURL}
                   alt={stadium.name}
                   className="stadium-image"
                 />
@@ -107,6 +127,22 @@ const StadiumsView = () => {
             fullWidth
             value={newStadium.name}
             onChange={(e) => setNewStadium({ ...newStadium, name: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Rows"
+            type="number"
+            fullWidth
+            value={newStadium.rows}
+            onChange={(e) => setNewStadium({ ...newStadium, rows: Math.min(Math.max(e.target.value, 0), 99) })}
+          />
+          <TextField
+            margin="dense"
+            label="Columns"
+            type="number"
+            fullWidth
+            value={newStadium.cols}
+            onChange={(e) => setNewStadium({ ...newStadium, cols: Math.min(Math.max(e.target.value, 0), 99) })}
           />
           <TextField
             margin="dense"

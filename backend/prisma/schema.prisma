@@ -38,6 +38,7 @@ model Stadium {
 model Team {
   id          Int     @id @default(autoincrement())
   name        String
+  logoUrl     String
   homeMatches Match[] @relation("HomeMatch")
   awayMatches Match[] @relation("AwayMatches")
 }
