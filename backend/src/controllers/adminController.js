@@ -59,6 +59,12 @@ export const removeUser = async (req, res) => {
         return res.status(400).json({
             message: "user doesn't exist"
         })
+    await prisma.ticket.deleteMany({
+        where: {
+            username: userToDelete.username
+        },
+    });
+
     let deletedUser = await prisma.user.delete({
         where: {
             username: req.body.username

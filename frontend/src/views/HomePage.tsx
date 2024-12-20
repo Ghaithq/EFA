@@ -1,15 +1,33 @@
-// import { useState } from 'react'
-// import * as React from 'react';
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-// import Button from "@mui/material/Button";
-// import IconButton from "@mui/material/IconButton";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import ToolBar from "../components/Toolbar";
 import CardCustom from "../components/Card";
 import Footer from "../components/Footer";
+import { useEffect, useState } from "react";
+import {jwtDecode} from "jwt-decode";
 
-function HomePage() {
+const HomePage = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkUserRole = () => {
+      const token = localStorage.getItem("jwt");
+      if (token) {
+        try {
+          const decodedToken = jwtDecode(token);
+          if (decodedToken?.role === "Fan") {
+            setIsLoggedIn(true);
+          }
+        } catch (error) {
+          console.error("Error decoding token:", error);
+        }
+      }
+    };
+
+    checkUserRole();
+  }, []);
+
   return (
     <Box
       sx={{
@@ -19,9 +37,12 @@ function HomePage() {
         width: "100vw",
       }}
     >
+      {/* App Bar */}
       <AppBar position="static" sx={{ backgroundColor: "#FFFFFF" }}>
         <ToolBar />
       </AppBar>
+
+      {/* Main Welcome Card */}
       <CardCustom
         sx={{ width: "95vw", margin: "0 auto", mt: 2 }}
         image="../Cairo_Stadium-modified.jpg"
@@ -29,13 +50,15 @@ function HomePage() {
         text2="Here you can reserve your ticket for the next match"
         link=""
       />
+
+      {/* Grid of Cards */}
       <Grid
         container
         spacing={2}
         sx={{ width: "95vw", margin: "0 auto", mt: 2 }}
       >
-        {/* Card 1 */}
-        <Grid size="grow">
+        {/* Matches Card */}
+        <Grid item xs={12} sm={4}>
           <CardCustom
             sx={{ mb: 2 }}
             image="../football2-modified.jpg"
@@ -45,8 +68,8 @@ function HomePage() {
           />
         </Grid>
 
-        {/* Card 2 */}
-        <Grid size="grow">
+        {/* Stadiums Card */}
+        <Grid item xs={12} sm={4}>
           <CardCustom
             sx={{ mb: 2 }}
             image="../stad2-modified.jpg"
@@ -56,20 +79,24 @@ function HomePage() {
           />
         </Grid>
 
-        {/* Card 3 */}
-        <Grid size="grow">
-          <CardCustom
-            sx={{ mb: 2 }}
-            image="../tickets-modified.jpg"
-            text1="Tickets"
-            text2="Reserve your ticket for the next match"
-            link="/tickets"
-          />
-        </Grid>
+        {/* Tickets Card (Visible Only for Logged-In Users) */}
+        {isLoggedIn && (
+          <Grid item xs={12} sm={4}>
+            <CardCustom
+              sx={{ mb: 2 }}
+              image="../tickets-modified.jpg"
+              text1="Tickets"
+              text2="Reserve your ticket for the next match"
+              link="/tickets"
+            />
+          </Grid>
+        )}
       </Grid>
+
+      {/* Footer */}
       <Footer />
     </Box>
   );
-}
+};
 
 export default HomePage;

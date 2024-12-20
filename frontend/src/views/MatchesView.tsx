@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import ToolBar from "../components/Toolbar";
 import Footer from "../components/Footer";
+import EventSeatIcon from "@mui/icons-material/EventSeat";
+import { io, Socket } from "socket.io-client";
+import TicketIcon from "@mui/icons-material/ConfirmationNumber";
 import { jwtDecode } from "jwt-decode";
 import {
   Box,
@@ -29,6 +32,14 @@ const MatchesView: React.FC = () => {
   const [linesmen, setLinesmen] = useState<string[]>([]);
   const [matches, setMatches] = useState<(typeof newMatch)[]>([]);
   const [isManager, setIsManager] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [openReserveDialog, setOpenReserveDialog] = useState(false);
+  const [selectedStadium, setSelectedStadium] = useState({ row: 0, col: 0 });
+  const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+  const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
+  const [reservedSeats, setReservedSeats] = useState<number[]>([]);
+  const [userName, setUserName] = useState<string | null>(null);
+  const socketRef = useRef<Socket | null>(null);
 
 
   useEffect(() => {
@@ -37,10 +48,11 @@ const MatchesView: React.FC = () => {
       if (token) {
         try {
           const decodedToken = jwtDecode(token);
-          console.log(decodedToken);
+          setUserName(decodedToken.username);
           if (decodedToken.role === "Manager") {
             setIsManager(true);
-          }
+          } else if (decodedToken.role == "Fan")
+            setIsLoggedIn(true);
         } catch (error) {
           console.error("Error decoding token:", error);
         }
@@ -63,6 +75,7 @@ const MatchesView: React.FC = () => {
         setReferees(refResponse.data);
         setLinesmen(linesMenResponse.data);
         const transformedData = matchesResponse.data.map((match: any) => ({
+          id: match.id,
           stadiumName: stadiumResponse.data.find((stadium) => stadium.id === match.stadiumid).name,
           refName: referees.find((referee) => referee.id === match.refereeid),
           linesMan1Name: linesmen.find((linesman) => linesman.id === match.linesMan1id),
@@ -90,6 +103,43 @@ const MatchesView: React.FC = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    socketRef.current = io("http://localhost:3000");
+
+    socketRef.current.on("connect", () => {
+      console.log("Connected to socket server");
+    });
+
+    socketRef.current.on("update-reserved-seats", (msg) => {
+      console.log("hiiiiiiiiiiiiiiiiiiiiii")
+      console.log(msg);
+      // console.log(index);
+      console.log(reservedSeats);
+      if (selectedMatchId === msg.matchId) {
+        setReservedSeats((prevSeats) => [...prevSeats, msg.seatIndex]);
+      }
+    });
+
+    return () => {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    };
+  }, [selectedMatchId]);
+
+
+  const fetchReservedSeats = async (matchId: number, currentStadium) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/get-reserved-tickets/${matchId}`);
+      const reservedSeatsData = response.data;
+      const reservedIndices = reservedSeatsData.map(
+        (seat) => (seat.row - 1) * currentStadium.cols + seat.col - 1
+      );
+      setReservedSeats(reservedIndices);
+    } catch (error) {
+      console.error("Error fetching reserved seats:", error);
+    }
+  };
+
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [newMatch, setNewMatch] = useState({
@@ -106,14 +156,7 @@ const MatchesView: React.FC = () => {
   });
 
 
-  const [editedMatch, setEditedMatch] = useState({
-    id: 0,
-    homeTeamid: "",
-    awayTeamid: "",
-    stadiumid: "",
-    date: "",
-    time: "",
-  });
+  const [editedMatch, setEditedMatch] = useState({});
 
   const handleClickOpenAdd = () => setOpenAddDialog(true);
   const handleCloseAdd = () => setOpenAddDialog(false);
@@ -136,8 +179,6 @@ const MatchesView: React.FC = () => {
 
         const updatedMatch = { ...prevState, [name]: name === "date" || name === "time" ? value.toString() : Number(value) };
 
-        console.log(updatedMatch);
-
         if (name === "homeTeamid") {
           const selectedTeam = teams.find((team) => team.id === Number(value));
           updatedMatch.team1Logo = selectedTeam?.logoUrl || "";
@@ -151,26 +192,56 @@ const MatchesView: React.FC = () => {
       });
     } else {
       setEditedMatch((prevState) => {
-        const updatedMatch = { ...prevState, [name]: value };
-
-        if (name === "team1") {
-          const selectedTeam = teams.find((team) => team.name === value);
-          updatedMatch.team1Logo = selectedTeam?.logoUrl || "";
-        }
-        if (name === "team2") {
-          const selectedTeam = teams.find((team) => team.name === value);
-          updatedMatch.team2Logo = selectedTeam?.logoUrl || "";
-        }
-
+        const updatedMatch = { ...prevState, [name]: name === "date" || name === "time" ? value.toString() : Number(value) };
         return updatedMatch;
       });
     }
   };
 
+  const handleConfirmReservation = async () => {
+    if (selectedMatchId !== null && selectedSeats.length > 0) {
+      try {
+        console.log("matchid: " + selectedMatchId)
+        const token = localStorage.getItem("jwt");
+
+        // Loop over selected seats and send individual requests
+        for (const seat of selectedSeats) {
+          const row = Math.floor(seat / selectedStadium.cols) + 1;
+          const col = (seat % selectedStadium.cols) + 1;
+
+          console.log(userName)
+          await axios.post(
+            "http://localhost:3000/match/reserve-seats",
+            {
+              username: userName,
+              matchid: selectedMatchId,
+              row: row,
+              col: col,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+        }
+
+        console.log("All reservations successful");
+        setOpenReserveDialog(false);
+
+        setSelectedSeats([]);
+      } catch (error) {
+        console.error("Error reserving tickets:", error);
+      }
+    } else {
+      console.error("No match selected or no seats chosen");
+    }
+  };
+
+
 
   const handleAddMatch = async () => {
     const combinedDateTime = `${newMatch.date}T${newMatch.time}:00.000Z`;
-    console.log(combinedDateTime);
 
     try {
       const response = await axios.post(
@@ -208,6 +279,7 @@ const MatchesView: React.FC = () => {
       });
 
       handleCloseAdd();
+      window.location.reload();
     } catch (error: any) {
       if (error.response) {
         // Server responded with a status code outside the 2xx range
@@ -222,20 +294,78 @@ const MatchesView: React.FC = () => {
     }
   };
 
-
-  const handleEditMatch = async () => {
-    try {
-      await axios.put(`/api/matches/${editedMatch.id}`, editedMatch);
-      setMatches((prevMatches) =>
-        prevMatches.map((match) =>
-          match.id === editedMatch.id ? editedMatch : match
-        )
-      ); // Update the match in the state
-      handleCloseEdit();
-    } catch (error) {
-      console.error("Error editing match:", error);
+  const handleReserveTicket = (match) => {
+    const stadium = stadiums.find((stadium) => stadium.id === match.stadiumid);
+    if (stadium) {
+      console.log("Hi")
+      console.log(stadium)
+      setSelectedStadium(stadium);
+      console.log(selectedStadium)
+      console.log(match);
+      setSelectedMatchId(match.id);
+      fetchReservedSeats(match.id, stadium);
+      setOpenReserveDialog(true);
     }
   };
+
+  const toggleSeatSelection = (seatNumber: number) => {
+    if (isManager)
+      return
+    console.log(selectedSeats)
+    setSelectedSeats((prev) =>
+      prev.includes(seatNumber)
+        ? prev.filter((seat) => seat !== seatNumber)
+        : [...prev, seatNumber]
+    );
+  };
+
+
+
+  const handleEditMatch = async () => {
+    console.log(editedMatch)
+    const combinedDateTime = `${editedMatch.date}T${editedMatch.time}:00.000Z`;
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/manager/edit-match/`,
+        {
+          ...editedMatch,
+          date: combinedDateTime,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+        }
+      );
+
+      console.log(response.data)
+
+      const serverResponse = response.data;
+      setMatches((prevMatches) =>
+        prevMatches.map((match) =>
+          match.id === editedMatch.id ? { ...editedMatch } : match
+        )
+      );
+      console.log(serverResponse);
+
+      setEditedMatch({});
+      handleCloseEdit();
+      window.location.reload();
+    } catch (error: any) {
+      if (error.response) {
+        // Server responded with a status code outside the 2xx range
+        console.error("Server Error:", error.response.data.message || error.response.data);
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error("No response from server:", error.request);
+      } else {
+        // Something else went wrong
+        console.error("Error during request setup:", error.message);
+      }
+    }
+  };
+
 
   return (
     <Box sx={{ width: "100vw" }}>
@@ -281,19 +411,33 @@ const MatchesView: React.FC = () => {
                   {match.date} at {match.time}
                 </Typography>
                 <Typography variant="body2" className="stadium-name">
-                  {match.stadium}
+                  {match.stadiumName}
                 </Typography>
-                <div className="reserve-button-container">
-                  <Button
-                    variant="contained"
-                    className="reserve-button"
-                    onClick={() =>
-                      alert(`You reserved a ticket for match ID: ${match.id}`)
-                    }
-                  >
-                    Reserve Ticket
-                  </Button>
-                </div>
+                {isLoggedIn &&
+                  <div className="reserve-button-container">
+                    <Button
+                      variant="contained"
+                      className="reserve-button"
+                      onClick={() => {
+                        handleReserveTicket(match)
+                      }
+                      }
+                    >
+                      Reserve Ticket
+                    </Button>
+                  </div>
+                }
+                {isManager &&
+                  <div className="reserve-button-container">
+                    <Button
+                      variant="contained"
+                      className="reserve-button"
+                      onClick={() => { handleReserveTicket(match) }}
+                    >
+                      View Reserved Tickets
+                    </Button>
+                  </div>
+                }
               </CardContent>
               {/* Team 2 Logo */}
               <img
@@ -509,7 +653,6 @@ const MatchesView: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Edit Match Dialog */}
       <Dialog
         open={openEditDialog}
@@ -519,64 +662,153 @@ const MatchesView: React.FC = () => {
         <DialogTitle>Edit Match</DialogTitle>
         <DialogContent>
           <TextField
+            select
             label="Team 1"
             fullWidth
             margin="normal"
-            name="team1"
-            value={editedMatch.team1Name}
+            name="homeTeamid"
+            value={editedMatch.homeTeamid || ""}
             onChange={(e) => handleInputChange(e, "edit")}
             variant="outlined"
-          />
+            SelectProps={{ native: true }}
+            InputLabelProps={{ shrink: true }}
+          >
+            <option value="">-- Select Team 1 --</option>
+            {teams.map((team) => (
+              <option key={team.id} value={team.id} disabled={team.id === editedMatch.awayTeamid}>
+                {team.name}
+              </option>
+            ))}
+          </TextField>
+
           <TextField
+            select
             label="Team 2"
             fullWidth
             margin="normal"
-            name="team2"
-            value={editedMatch.team2Name}
+            name="awayTeamid"
+            value={editedMatch.awayTeamid || ""}
             onChange={(e) => handleInputChange(e, "edit")}
             variant="outlined"
-          />
+            SelectProps={{ native: true }}
+            InputLabelProps={{ shrink: true }}
+          >
+            <option value="">-- Select Team 2 --</option>
+            {teams.map((team) => (
+              <option key={team.id} value={team.id} disabled={team.id === editedMatch.homeTeamid}>
+                {team.name}
+              </option>
+            ))}
+          </TextField>
+
           <TextField
-            label="Date"
-            fullWidth
-            margin="normal"
-            name="date"
-            type="date"
-            value={editedMatch.date}
-            onChange={(e) => handleInputChange(e, "edit")}
-            variant="outlined"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <TextField
-            label="Time"
-            fullWidth
-            margin="normal"
-            name="time"
-            type="time"
-            value={editedMatch.time}
-            onChange={(e) => handleInputChange(e, "edit")}
-            variant="outlined"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <TextField
+            select
             label="Stadium"
             fullWidth
             margin="normal"
-            name="stadium"
-            value={editedMatch.stadiumName}
+            name="stadiumid"
+            value={editedMatch.stadiumid || ""}
             onChange={(e) => handleInputChange(e, "edit")}
             variant="outlined"
+            SelectProps={{ native: true }}
+            InputLabelProps={{ shrink: true }}
+          >
+            <option value="">-- Select Stadium --</option>
+            {stadiums.map((stadium) => (
+              <option key={stadium.id} value={stadium.id}>
+                {stadium.name}
+              </option>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            label="Referee"
+            fullWidth
+            margin="normal"
+            name="refereeid"
+            value={editedMatch.refereeid || ""}
+            onChange={(e) => handleInputChange(e, "edit")}
+            variant="outlined"
+            SelectProps={{ native: true }}
+            InputLabelProps={{ shrink: true }}
+          >
+            <option value="">-- Select Referee --</option>
+            {referees.map((referee) => (
+              <option key={referee.id} value={referee.id}>
+                {referee.name}
+              </option>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            label="Linesman 1"
+            fullWidth
+            margin="normal"
+            name="linesMan1id"
+            value={editedMatch.linesMan1id || ""}
+            onChange={(e) => handleInputChange(e, "edit")}
+            variant="outlined"
+            SelectProps={{ native: true }}
+            InputLabelProps={{ shrink: true }}
+          >
+            <option value="">-- Select Linesman 1 --</option>
+            {linesmen.map((linesman) => (
+              <option key={linesman.id} value={linesman.id}>
+                {linesman.name}
+              </option>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            label="Linesman 2"
+            fullWidth
+            margin="normal"
+            name="linesMan2id"
+            value={editedMatch.linesMan2id || ""}
+            onChange={(e) => handleInputChange(e, "edit")}
+            variant="outlined"
+            SelectProps={{ native: true }}
+            InputLabelProps={{ shrink: true }}
+          >
+            <option value="">-- Select Linesman 2 --</option>
+            {linesmen.map((linesman) => (
+              <option key={linesman.id} value={linesman.id}>
+                {linesman.name}
+              </option>
+            ))}
+          </TextField>
+
+          <TextField
+            label="Date"
+            type="date"
+            fullWidth
+            margin="normal"
+            name="date"
+            value={editedMatch.date || ""}
+            onChange={(e) => handleInputChange(e, "edit")}
+            variant="outlined"
+            InputLabelProps={{ shrink: true }}
+          />
+          <TextField
+            label="Time"
+            type="time"
+            fullWidth
+            margin="normal"
+            name="time"
+            value={editedMatch.time || ""}
+            onChange={(e) => handleInputChange(e, "edit")}
+            variant="outlined"
+            InputLabelProps={{ shrink: true }}
           />
           <TextField
             label="Team 1 Logo URL"
             fullWidth
             margin="normal"
             name="team1Logo"
-            value={editedMatch.team1Logo}
+            value={editedMatch.team1Logo || ""}
             onChange={(e) => handleInputChange(e, "edit")}
             variant="outlined"
           />
@@ -585,7 +817,7 @@ const MatchesView: React.FC = () => {
             fullWidth
             margin="normal"
             name="team2Logo"
-            value={editedMatch.team2Logo}
+            value={editedMatch.team2Logo || ""}
             onChange={(e) => handleInputChange(e, "edit")}
             variant="outlined"
           />
@@ -594,9 +826,108 @@ const MatchesView: React.FC = () => {
           <Button onClick={handleCloseEdit} color="secondary">
             Cancel
           </Button>
-          <Button autoFocus onClick={handleEditMatch} color="primary">
+          <Button onClick={handleEditMatch} color="primary">
             Save Changes
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reserve Tickets Dialog */}
+      <Dialog
+        open={openReserveDialog}
+        onClose={() => setOpenReserveDialog(false)}
+        className="reserve-dialog"
+      >
+        {isLoggedIn &&
+          <DialogTitle>Reserve Tickets</DialogTitle>
+        }
+        {isManager &&
+          <DialogTitle>Manager's View</DialogTitle>
+        }
+        <DialogContent>
+          {isLoggedIn &&
+            <Typography>Select your seats:</Typography>
+          }
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${selectedStadium.cols}, 1fr)`,
+              gap: 1,
+              marginTop: 2,
+            }}
+          >
+            {Array.from({ length: selectedStadium.rows * selectedStadium.cols }).map((_, idx) => {
+              const isReserved = reservedSeats.includes(idx);
+              return (
+                <Button
+                  key={idx}
+                  variant={
+                    selectedSeats.some((seat) => seat === idx)
+                      ? "contained"
+                      : "outlined"
+                  }
+                  disabled={isReserved}
+                  onClick={() => !isReserved && toggleSeatSelection(idx)}
+                  startIcon={<EventSeatIcon />}
+                  sx={{
+                    width: 50,
+                    height: 50,
+                    backgroundColor: isReserved ? "grey" : undefined,
+                    color: isReserved ? "white" : undefined,
+                  }}
+                >
+                  {idx + 1}
+                </Button>
+              );
+            })}
+          </Box>
+
+          {/* Ticket Price */}
+          {isLoggedIn &&
+            <Typography sx={{ mt: 3, mb: 1, fontWeight: "bold" }}>
+              Ticket Price: $420
+            </Typography>
+          }
+
+          {/* Credit Card Details (Mock) */}
+          {isLoggedIn &&
+            <Typography sx={{ mt: 1, mb: 1 }}>Payment Information:</Typography>
+          }
+          {isLoggedIn &&
+            <TextField
+              label="Credit Card Number (Mock)"
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              type="text"
+              name="mockCreditCardNumber"
+            />
+          }
+          {isLoggedIn &&
+            <TextField
+              label="PIN (Mock)"
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              type="password"
+              name="mockPin"
+            />
+          }
+
+
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenReserveDialog(false)} color="secondary">
+            Cancel
+          </Button>
+          {isLoggedIn &&
+            <Button
+              onClick={handleConfirmReservation}
+              color="primary"
+            >
+              Confirm Reservation
+            </Button>
+          }
         </DialogActions>
       </Dialog>
 

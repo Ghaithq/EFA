@@ -1,45 +1,92 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios'; // For API calls
 import AppBar from "@mui/material/AppBar";
 import ToolBar from "../components/Toolbar";
+import {jwtDecode} from 'jwt-decode';
 import Footer from "../components/Footer";
-import { Box, Grid, Typography, Card, CardContent, Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber'; // Correct icon
 import './UserTickets.css';
 
-const ticketsData = [
-  { id: 1, stadiumName: 'Cairo International Stadium', event: 'Football Match - Cairo vs Alexandria', date: '2024-12-10', status: 'Booked' },
-  { id: 2, stadiumName: 'Borg El Arab Stadium', event: 'Football Match - Cairo vs Giza', date: '2024-12-15', status: 'Booked' },
-  { id: 3, stadiumName: 'Al Ahly Stadium', event: 'Football Match - Al Ahly vs Zamalek', date: '2024-12-20', status: 'Booked' },
-  { id: 3, stadiumName: 'Al Ahly Stadium', event: 'Football Match - Al Ahly vs Zamalek', date: '2024-12-20', status: 'Booked' },
-  { id: 3, stadiumName: 'Al Ahly Stadium', event: 'Football Match - Al Ahly vs Zamalek', date: '2024-12-20', status: 'Booked' },
-  { id: 3, stadiumName: 'Al Ahly Stadium', event: 'Football Match - Al Ahly vs Zamalek', date: '2024-12-20', status: 'Booked' },
-  { id: 3, stadiumName: 'Al Ahly Stadium', event: 'Football Match - Al Ahly vs Zamalek', date: '2024-12-20', status: 'Booked' },
-  { id: 3, stadiumName: 'Al Ahly Stadium', event: 'Football Match - Al Ahly vs Zamalek', date: '2024-12-20', status: 'Booked' },
-  { id: 3, stadiumName: 'Al Ahly Stadium', event: 'Football Match - Al Ahly vs Zamalek', date: '2024-12-20', status: 'Booked' },
-];
-
 const TicketPage = () => {
-  const [tickets, setTickets] = useState(ticketsData);
+  const [tickets, setTickets] = useState([]);
   const [open, setOpen] = useState(false);
-  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+
+  // Fetch user tickets on component mount
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/get-tickets-for-user', {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+        });
+        setTickets(response.data);
+      } catch (error) {
+        console.error("Error fetching tickets:", error);
+      }
+    };
+
+    fetchTickets();
+  }, []);
 
   // Handle opening the cancel confirmation dialog
-  const handleClickOpen = (ticketId: number) => {
-    setSelectedTicketId(ticketId);
+  const handleClickOpen = (ticket) => {
+    setSelectedTicket(ticket);
     setOpen(true);
   };
 
   // Handle closing the cancel confirmation dialog
   const handleClose = () => {
     setOpen(false);
-    setSelectedTicketId(null);
+    setSelectedTicket(null);
+  };
+
+  const getUsername = () => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      const decoded = jwtDecode(token);
+      return decoded.username; // Adjust based on your JWT payload
+    }
+    return null;
   };
 
   // Handle canceling the ticket
-  const handleCancelTicket = () => {
-    if (selectedTicketId !== null) {
-      setTickets(tickets.filter(ticket => ticket.id !== selectedTicketId));
-      setOpen(false);
+  const handleCancelTicket = async () => {
+    if (selectedTicket) {
+      try {
+        const { row, col, matchid } = selectedTicket;
+        await axios.delete('http://localhost:3000/cancel-ticket', {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+          data: {
+            row,
+            col,
+            matchid,
+            username: getUsername(),
+          },
+        });
+
+        setTickets(tickets.filter(ticket => ticket.row !== row || ticket.col !== col || ticket.matchid !== matchid));
+        setOpen(false);
+      } catch (error) {
+        console.error("Error canceling ticket:", error);
+      }
     }
   };
 
@@ -75,25 +122,25 @@ const TicketPage = () => {
         {/* Tickets Grid */}
         <Grid container spacing={4} justifyContent="center">
           {tickets.map((ticket) => (
-            <Grid item xs={12} sm={6} md={4} key={ticket.id}>
+            <Grid item xs={12} sm={6} md={4} key={`${ticket.row}-${ticket.col}-${ticket.matchid}`}>
               <Card className="ticket-card">
                 <CardContent>
                   <Typography variant="h5" className="ticket-title">
-                    {ticket.event}
+                    Match: {ticket.match.name}
                   </Typography>
                   <Typography variant="body1" className="ticket-details">
-                    Stadium: {ticket.stadiumName}
+                    Stadium: {ticket.match.stadium.name}
                   </Typography>
                   <Typography variant="body2" className="ticket-details">
-                    Date: {ticket.date}
+                    Date: {ticket.match.date}
                   </Typography>
                   <Typography variant="body2" className="ticket-status">
-                    Status: {ticket.status}
+                    Row: {ticket.row}, Col: {ticket.col}
                   </Typography>
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => handleClickOpen(ticket.id)}
+                    onClick={() => handleClickOpen(ticket)}
                     className="cancel-ticket-button"
                   >
                     Cancel Ticket

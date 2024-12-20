@@ -156,12 +156,13 @@ export const createMatch = async (req, res) => {
 
 
 export const editMatch = async (req, res) => {
-    if (req.body.homeTeamid == null || req.body.homeTeamid == "" || !req.body.homeTeamid.isInteger() ||
-        req.body.awayTeamid == null || req.body.awayTeamid == "" ||!req.body.awayTeamid.isInteger() ||
-        req.body.refereeid == null || req.body.refereeid == "" || !req.body.refereeid.isInteger()||
-        req.body.linesMan1id == null || req.body.linesMan1id == "" ||req.body.linesMan1id.isInteger()||
-        req.body.linesMan2id == null || req.body.linesMan2id == "" ||!req.body.linesMan2id.isInteger() ||
-        req.body.stadiumid == null || req.body.stadiumid == "" || !req.body.stadiumid.isInteger() ||
+    console.log(req.body)
+    if (req.body.homeTeamid == null || req.body.homeTeamid == "" || !Number.isInteger(req.body.homeTeamid) ||
+        req.body.awayTeamid == null || req.body.awayTeamid == "" ||!Number.isInteger(req.body.awayTeamid) ||
+        req.body.refereeid == null || req.body.refereeid == "" || !Number.isInteger(req.body.refereeid)||
+        req.body.linesMan1id == null || req.body.linesMan1id == "" ||!Number.isInteger(req.body.linesMan1id)||
+        req.body.linesMan2id == null || req.body.linesMan2id == "" ||!Number.isInteger(req.body.linesMan2id) ||
+        req.body.stadiumid == null || req.body.stadiumid == "" || !Number.isInteger(req.body.stadiumid) ||
         req.body.date == null || req.body.date == "" 
     )
         return res.status(400).json({
@@ -277,34 +278,34 @@ export const editMatch = async (req, res) => {
             date: req.body.date
         }
     })
-    if (overlappingAwayTeam)
+    if (match.awayTeamid != req.body.awayTeamid && overlappingAwayTeam)
         return res.status(404).json({
             message: "away team got a match at this date"
         })
-    if (overlappingHomeTeam)
+    if (match.homeTeamid != req.body.homeTeamid &&overlappingHomeTeam)
         return res.status(404).json({
             message: "home team got a match at this date"
         })
-    if (overlappingReferee)
+    if (match.refereeid != req.body.refereeid && overlappingReferee)
         return res.status(404).json({
             message: "referee got a match at this date"
         })
-    if (overlappingLinesMan1id)
+    if (match.linesMan1id != req.body.linesMan1id && overlappingLinesMan1id)
         return res.status(404).json({
             message: "lines man 1 got a match at this date"
         })
-    if (overlappinglinesMan2id)
+    if (match.linesMan2id != req.body.linesMan2id && overlappinglinesMan2id)
         return res.status(404).json({
             message: "lines man 2 got a match at this date"
         })
-    if (overlappingStadium)
+    if (match.stadiumid != req.body.stadiumid && overlappingStadium)
         return res.status(404).json({
             message: "stadium got a match at this date"
         })
 
     const editedMatch = await prisma.match.update({
         where: {
-            id: req.body.matchid
+            id: req.body.id
         },
         data: {
             homeTeamid: req.body.homeTeamid,

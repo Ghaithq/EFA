@@ -24,6 +24,7 @@ model User {
   address   String?
   email     String
   role      String
+  tickets Ticket[] @relation("UserTickets")
 }
 
 model Stadium {
@@ -78,7 +79,8 @@ model Ticket {
   row     Int
   col     Int
   matchid Int
+  username String @default("Amreux1")
   match   Match @relation("Tickets", fields: [matchid], references: [id])
-
+  user   User @relation("UserTickets", fields: [username], references: [username])
   @@id([row, col, matchid])
 }
