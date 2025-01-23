@@ -1,5 +1,1 @@
-before running install packages by running `npm i`
-what is left?
-- F7: View vacant/reserved seats for each match.
-- F11: Cancel a reservation
-- input vaildation with some package
+A web application for reserving tickets for Egyptian Football League matches, built with React for the frontend, Express for the backend, and PostgreSQL for the database, providing an efficient and user-friendly platform for ticket management.
